@@ -3,7 +3,6 @@
 #include "studentdialog.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QSqlQueryModel>
 #include <QDebug>
 #include <QSqlError>
 
@@ -27,6 +26,12 @@ void LoginDialog::on_loginBtnBox_accepted()
 {
     QString in_user = ui->userEdit->text();
     QString in_passwd = ui->passwordEdit->text();
+    //调试用
+    StudentDialog *sd = new StudentDialog(in_user);
+    sd->show();
+    this->close();
+    return;
+    //end
     QSqlQuery query;
     QString str = QString("SELECT password FROM sa WHERE user='%1'").arg(in_user);
     if (!query.exec(str))
