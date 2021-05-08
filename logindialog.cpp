@@ -1,5 +1,6 @@
 #include "logindialog.h"
 #include "./ui_logindialog.h"
+#include "studentdialog.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlQueryModel>
@@ -34,7 +35,12 @@ void LoginDialog::on_loginBtnBox_accepted()
     {
         QString passwd = query.value(0).toString();
         if (passwd == in_passwd)
+        {
             qDebug() << "登陆成功！";
+            StudentDialog *sd = new StudentDialog(in_user);
+            sd->show();
+            this->close();
+        }
         else
             qDebug() << "登陆失败！";
     }
