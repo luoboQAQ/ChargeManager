@@ -2,6 +2,13 @@
 #define STUDENTDIALOG_H
 
 #include <QDialog>
+#include <QTime>
+#include <QTimer>
+#include <QSqlQuery>
+#include <QDebug>
+#include <QMessageBox>
+#include <QSqlError>
+#include <QDateTime>
 
 namespace Ui
 {
@@ -25,8 +32,20 @@ private slots:
 
     void on_rechargeBtn_clicked();
 
+    void onTimeOut(void);
+
 private:
     Ui::StudentDialog *ui;
+    QString computer_id;
+    bool isOnline;
+    bool isCardOk;
+    double banlance;
+    double cost;
+    QString cardid;
+    QString serial_num; //本次上机的流水号
+    QTimer m_timer;
+    int stime; //秒
+    int mtime; //分钟
 };
 
 #endif // STUDENTDIALOG_H
