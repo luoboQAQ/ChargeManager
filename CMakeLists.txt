@@ -27,14 +27,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
-set(PROJECT_SOURCES
-        main.cpp
-        logindialog.cpp
-        logindialog.h
-        logindialog.ui
-        database.h
-        database.cpp
-)
+#查找当前文件夹中的所有源代码文件，也可以通过Set命令将所有文件设置为一个变量
+FILE(GLOB SRC_FILES "./*.cpp")
+#同理，查找当前文件夹中所有的头文件
+FILE(GLOB HEAD_FILES "./*.h")
+#同理，查找当前文件夹中所有的ui文件
+FILE(GLOB UI_FILES "./*.ui")
+
+set(PROJECT_SOURCES ${SRC_FILES} ${HEAD_FILES} ${UI_FILES})
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(ChargeManager
