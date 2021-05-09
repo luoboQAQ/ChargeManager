@@ -259,7 +259,7 @@
         <item row="4" column="1">
          <widget class="QLabel" name="m_CostLabel">
           <property name="text">
-           <string>0元</string>
+           <string>0.0元</string>
           </property>
          </widget>
         </item>

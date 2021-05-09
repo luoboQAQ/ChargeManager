@@ -65,6 +65,8 @@ StudentDialog::StudentDialog(QString user, QWidget *parent) : QDialog(parent),
 
 StudentDialog::~StudentDialog()
 {
+    if (isOnline)
+        on_loginBtn_clicked();
     delete ui;
 }
 
@@ -120,6 +122,20 @@ void StudentDialog::on_loginBtn_clicked()
     {
         isOnline = false;
         m_timer.stop();
+        //更新上机记录
+        QString str = QString("UPDATE record "
+                              "SET is_using=0,"
+                              "ctime=ctime+'%1' "
+                              "WHERE serial_num='%2'")
+                          .arg(QString::number(stime))
+                          .arg(serial_num);
+        QSqlQuery query;
+        if (!query.exec(str))
+        {
+            qDebug("更新数据失败！");
+            qDebug() << query.lastError();
+            return;
+        }
         //更新界面
         ui->loginBtn->setText("上机");
         ui->m_OkLabel->setText("已下线");
