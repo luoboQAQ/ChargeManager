@@ -43,7 +43,9 @@ private:
     double cost;
     QString cardid;
     QString serial_num; //本次上机的流水号
+    QString userid;//sno
     QTimer m_timer;
+
     int stime; //秒
     int mtime; //分钟
 };

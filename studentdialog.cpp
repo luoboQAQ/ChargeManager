@@ -14,6 +14,7 @@ StudentDialog::StudentDialog(QString user, QWidget *parent) : QDialog(parent),
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
 
     //设置个人信息区
+    userid=user;
     ui->s_NoLabel->setText(user);
     QSqlQuery query;
     QString str = QString("SELECT sname,sdc,sclass FROM student WHERE sno='%1'").arg(user);
@@ -199,9 +200,38 @@ void StudentDialog::on_searchBtn_clicked()
 //挂失槽函数
 void StudentDialog::on_reportLossBtn_clicked()
 {
+    if(!isCardOk)
+    {QMessageBox::information(this,"提示","已经挂失！");return;}
+    if(isOnline)
+    {QMessageBox::information(this,"提示","上机状态不能挂失！");return;}
     if (QMessageBox::question(this, "挂失", "你是否确定要挂失？",
                               QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
         return;
+    QString str=QString("UPDATE card SET state='0' WHERE cardid='%1'")
+            .arg(cardid);
+    QSqlQuery query;
+    if (!query.exec(str))
+    {
+        qDebug("挂失失败！");
+        qDebug() << query.lastError();
+        return;
+    }
+    else QMessageBox::information(this,"提示","挂失成功！");
+     ui->c_OkLabel->setText("挂失");
+     isCardOk=0;
+    QDateTime current_time = QDateTime::currentDateTime();
+    QString losstime = current_time.toString("yyyy-MM-ddThh:mm:ss");
+    str=QString("INSERT INTO loss_record "
+   "VALUES('%1','%2','%3','0')")
+            .arg(losstime)
+            .arg(cardid)
+            .arg(userid);
+    if (!query.exec(str))
+    {
+        qDebug("插入数据失败！");
+        qDebug() << query.lastError();
+        return;
+    }
 }
 
 //充值槽函数
