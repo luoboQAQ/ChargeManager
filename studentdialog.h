@@ -1,14 +1,15 @@
 #ifndef STUDENTDIALOG_H
 #define STUDENTDIALOG_H
 
-#include <QDialog>
-#include <QTime>
-#include <QTimer>
-#include <QSqlQuery>
+#include <QDateTime>
 #include <QDebug>
+#include <QDialog>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QSqlError>
-#include <QDateTime>
+#include <QSqlQuery>
+#include <QTime>
+#include <QTimer>
 
 namespace Ui
 {
@@ -43,7 +44,7 @@ private:
     double cost;
     QString cardid;
     QString serial_num; //本次上机的流水号
-    QString userid;//sno
+    QString userid;     //sno
     QTimer m_timer;
 
     int stime; //秒

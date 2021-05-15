@@ -14,7 +14,7 @@ StudentDialog::StudentDialog(QString user, QWidget *parent) : QDialog(parent),
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
 
     //设置个人信息区
-    userid=user;
+    userid = user;
     ui->s_NoLabel->setText(user);
     QSqlQuery query;
     QString str = QString("SELECT sname,sdc,sclass FROM student WHERE sno='%1'").arg(user);
@@ -42,7 +42,7 @@ StudentDialog::StudentDialog(QString user, QWidget *parent) : QDialog(parent),
     ui->c_NoLabel->setText(cardid);
     ui->c_DateLabel->setText(query.value(1).toString().split('T').at(0));
     banlance = query.value(2).toDouble();
-    ui->c_BanlaLabel->setText(QString::number(banlance, 'f', 2));
+    ui->c_BanlaLabel->setText(QString::number(banlance, 'f', 1));
     isCardOk = query.value(3).toBool();
     if (isCardOk)
         ui->c_OkLabel->setText("正常");
@@ -95,10 +95,11 @@ void StudentDialog::on_loginBtn_clicked()
 
         //生成上机记录
         QString str = QString("INSERT INTO record"
-                              " VALUES('%1','%2','%3','0','1')")
+                              " VALUES('%1','%2','%3','0','0','%4','1')")
                           .arg(serial_num)
                           .arg(cardid)
-                          .arg(start_time);
+                          .arg(start_time)
+                          .arg(computer_id);
         QSqlQuery query;
         if (!query.exec(str))
         {
@@ -108,7 +109,7 @@ void StudentDialog::on_loginBtn_clicked()
         }
 
         //设定计时器
-        m_timer.start(1000);
+        m_timer.start(100);
         stime = 0;
         mtime = 0;
         cost = 0;
@@ -137,6 +138,22 @@ void StudentDialog::on_loginBtn_clicked()
             qDebug() << query.lastError();
             return;
         }
+        //生成流水号
+        QDateTime current_time = QDateTime::currentDateTime();
+        QString now_time = current_time.toString("yyyy-MM-ddThh:mm:ss");
+        //如果产生消费，则写入消费记录
+        str = QString("INSERT INTO charge_record(ctime,cardid,money,opeartor_id,state)"
+                      " VALUES('%1','%2','%3','%4','0')")
+                  .arg(now_time)
+                  .arg(cardid)
+                  .arg(cost)
+                  .arg(userid);
+        if (!query.exec(str))
+        {
+            qDebug("写入消费记录失败！");
+            qDebug() << query.lastError();
+            return;
+        }
         //更新界面
         ui->loginBtn->setText("上机");
         ui->m_OkLabel->setText("已下线");
@@ -153,7 +170,8 @@ void StudentDialog::onTimeOut(void)
         mtime++;
         //更新上机记录表
         QString str = QString("UPDATE record "
-                              "SET ctime=ctime+'100' "
+                              "SET ctime=ctime+'100',"
+                              "cost=cost+0.1 "
                               "WHERE serial_num='%1'")
                           .arg(serial_num);
         QSqlQuery query;
@@ -166,17 +184,7 @@ void StudentDialog::onTimeOut(void)
         //更新账户余额
         banlance -= 0.1;
         cost += 0.1;
-        str = QString("UPDATE card "
-                      "SET banlance=banlance-0.1 "
-                      "WHERE cardid='%1'")
-                  .arg(cardid);
-        if (!query.exec(str))
-        {
-            qDebug("更新余额失败！");
-            qDebug() << query.lastError();
-            return;
-        }
-        ui->c_BanlaLabel->setText(QString::number(banlance, 'f', 2));
+        ui->c_BanlaLabel->setText(QString::number(banlance, 'f', 1));
     }
     //更新界面上的信息
     QString strStime = QString::number(stime);
@@ -200,41 +208,62 @@ void StudentDialog::on_searchBtn_clicked()
 //挂失槽函数
 void StudentDialog::on_reportLossBtn_clicked()
 {
-    if(!isCardOk)
-    {QMessageBox::information(this,"提示","已经挂失！");return;}
-    if(isOnline)
-    {QMessageBox::information(this,"提示","上机状态不能挂失！");return;}
+    if (!isCardOk)
+    {
+        QMessageBox::information(this, "提示", "您已经挂失过了！");
+        return;
+    }
+    if (isOnline)
+    {
+        QMessageBox::information(this, "提示", "上机状态下不能挂失！");
+        return;
+    }
     if (QMessageBox::question(this, "挂失", "你是否确定要挂失？",
                               QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
         return;
-    QString str=QString("UPDATE card SET state='0' WHERE cardid='%1'")
-            .arg(cardid);
     QSqlQuery query;
-    if (!query.exec(str))
-    {
-        qDebug("挂失失败！");
-        qDebug() << query.lastError();
-        return;
-    }
-    else QMessageBox::information(this,"提示","挂失成功！");
-     ui->c_OkLabel->setText("挂失");
-     isCardOk=0;
     QDateTime current_time = QDateTime::currentDateTime();
     QString losstime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    str=QString("INSERT INTO loss_record "
-   "VALUES('%1','%2','%3','0')")
-            .arg(losstime)
-            .arg(cardid)
-            .arg(userid);
+    QString str = QString("INSERT INTO loss_record "
+                          "VALUES('%1','%2','%3','0')")
+                      .arg(losstime)
+                      .arg(cardid)
+                      .arg(userid);
     if (!query.exec(str))
     {
         qDebug("插入数据失败！");
         qDebug() << query.lastError();
         return;
     }
+    QMessageBox::information(this, "提示", "挂失成功！");
+    ui->c_OkLabel->setText("挂失");
+    isCardOk = 0;
 }
 
 //充值槽函数
 void StudentDialog::on_rechargeBtn_clicked()
 {
+    bool ok = false;
+    int inputValue = QInputDialog::getInt(this, "充值", "请输入要充值的金额：", 5, 1, 200, 1, &ok);
+    if (ok)
+    {
+        banlance += inputValue;
+        QSqlQuery query;
+        QDateTime current_time = QDateTime::currentDateTime();
+        QString ctime = current_time.toString("yyyy-MM-ddThh:mm:ss");
+        QString str = QString("INSERT INTO charge_record(ctime,cardid,money,opeartor_id,state)"
+                              " VALUES('%1','%2',%3,'%4',1)")
+                          .arg(ctime)
+                          .arg(cardid)
+                          .arg(inputValue)
+                          .arg(userid);
+        if (!query.exec(str))
+        {
+            QMessageBox::warning(this, "错误", "充值失败！");
+            qDebug() << query.lastError();
+            return;
+        }
+        QMessageBox::information(this, "提示", "充值成功！");
+        ui->c_BanlaLabel->setText(QString::number(banlance, 'f', 1));
+    }
 }

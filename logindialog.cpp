@@ -1,6 +1,7 @@
 #include "logindialog.h"
 #include "./ui_logindialog.h"
 #include "studentdialog.h"
+#include "admindialog.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QDebug>
@@ -53,5 +54,12 @@ void LoginDialog::on_loginBtnBox_accepted()
 
 void LoginDialog::on_loginBtnBox_rejected()
 {
+    //调试用
+    QString in_user = ui->userEdit->text();
+    AdminDialog *ad = new AdminDialog(in_user);
+    ad->show();
+    this->close();
+    return;
+    //end
     close();
 }

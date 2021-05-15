@@ -8,8 +8,8 @@ bool opendb();
 
 int main(int argc, char *argv[])
 {
-    opendb();
     QApplication a(argc, argv);
+    opendb();
     LoginDialog w;
     w.show();
     return a.exec();

@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>325</width>
-    <height>202</height>
+    <height>192</height>
    </rect>
   </property>
   <property name="font">
    <font>
-    <family>黑体</family>
-    <pointsize>12</pointsize>
+    <family>微软雅黑</family>
+    <pointsize>10</pointsize>
    </font>
   </property>
   <property name="windowTitle">
