@@ -12,7 +12,8 @@ StudentDialog::StudentDialog(QString user, QWidget *parent) : QDialog(parent),
     ui->setupUi(this);
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
-
+    querydialog = nullptr;
+    
     //设置个人信息区
     userid = user;
     ui->s_NoLabel->setText(user);
@@ -203,6 +204,19 @@ void StudentDialog::onTimeOut(void)
 //查询槽函数
 void StudentDialog::on_searchBtn_clicked()
 {
+    if (querydialog == nullptr)
+    {
+        querydialog = new SQueryDialog(cardid, this);
+        connect(querydialog, SIGNAL(windowClosed()), this, SLOT(DialogClosed()));
+        querydialog->show();
+    }
+}
+
+//查询窗口关闭时
+void StudentDialog::DialogClosed()
+{
+    delete querydialog;
+    querydialog = nullptr;
 }
 
 //挂失槽函数
@@ -243,6 +257,11 @@ void StudentDialog::on_reportLossBtn_clicked()
 //充值槽函数
 void StudentDialog::on_rechargeBtn_clicked()
 {
+    if (!isCardOk)
+    {
+        QMessageBox::warning(this, "错误", "上机卡已被挂失！");
+        return;
+    }
     bool ok = false;
     int inputValue = QInputDialog::getInt(this, "充值", "请输入要充值的金额：", 5, 1, 200, 1, &ok);
     if (ok)

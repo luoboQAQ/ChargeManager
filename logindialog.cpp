@@ -2,10 +2,6 @@
 #include "./ui_logindialog.h"
 #include "studentdialog.h"
 #include "admindialog.h"
-#include <QSqlDatabase>
-#include <QSqlQuery>
-#include <QDebug>
-#include <QSqlError>
 
 LoginDialog::LoginDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::LoginDialog)
@@ -27,29 +23,37 @@ void LoginDialog::on_loginBtnBox_accepted()
 {
     QString in_user = ui->userEdit->text();
     QString in_passwd = ui->passwordEdit->text();
-    //调试用
-    StudentDialog *sd = new StudentDialog(in_user);
-    sd->show();
-    this->close();
-    return;
-    //end
     QSqlQuery query;
-    QString str = QString("SELECT password FROM sa WHERE user='%1'").arg(in_user);
+    QString str = QString("SELECT passwd,tag FROM login WHERE user='%1'").arg(in_user);
     if (!query.exec(str))
+    {
+        qDebug("查询密码失败！");
         qDebug() << query.lastError();
+    }
     if (query.next())
     {
         QString passwd = query.value(0).toString();
+        int tag = query.value(1).toInt();
         if (passwd == in_passwd)
         {
-            qDebug() << "登陆成功！";
-            StudentDialog *sd = new StudentDialog(in_user);
-            sd->show();
-            this->close();
+            if (tag == 1)
+            {
+                StudentDialog *sd = new StudentDialog(in_user);
+                sd->show();
+                this->close();
+            }
+            else if (tag == 0)
+            {
+                AdminDialog *ad = new AdminDialog(in_user);
+                ad->show();
+                this->close();
+            }
         }
         else
-            qDebug() << "登陆失败！";
+            QMessageBox::warning(this, "错误", "密码错误！");
     }
+    else
+        QMessageBox::warning(this, "错误", "用户不存在！");
 }
 
 void LoginDialog::on_loginBtnBox_rejected()

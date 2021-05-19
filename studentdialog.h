@@ -1,6 +1,7 @@
 #ifndef STUDENTDIALOG_H
 #define STUDENTDIALOG_H
 
+#include "squerydialog.h"
 #include <QDateTime>
 #include <QDebug>
 #include <QDialog>
@@ -35,6 +36,8 @@ private slots:
 
     void onTimeOut(void);
 
+    void DialogClosed();
+
 private:
     Ui::StudentDialog *ui;
     QString computer_id;
@@ -49,6 +52,7 @@ private:
 
     int stime; //秒
     int mtime; //分钟
+    SQueryDialog *querydialog;
 };
 
 #endif // STUDENTDIALOG_H

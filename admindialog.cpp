@@ -7,18 +7,36 @@ AdminDialog::AdminDialog(QString user, QWidget *parent) : QDialog(parent),
     // 设置窗体有最小化按钮
     Qt::WindowFlags windowFlag = Qt::Dialog;
     windowFlag |= Qt::WindowMinimizeButtonHint;
-    windowFlag |= Qt::WindowCloseButtonHint;
+    windowFlag |= Qt::WindowCloseButtonHint; 
     setWindowFlags(windowFlag);
     ui->setupUi(this);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置表为不可编辑
+
     SetupName();
     GetComputerNums();
-    admin_id = "admin";
+    GetUserName(user);
 }
 
 AdminDialog::~AdminDialog()
 {
     delete ui;
+}
+
+//获取管理员姓名
+bool AdminDialog::GetUserName(QString user)
+{
+    QSqlQuery query;
+    QString str = QString("SELECT aname FROM admin WHERE aid='%1'").arg(user);
+    if (!query.exec(str) || !query.next())
+    {
+        qDebug("查询失败！");
+        qDebug() << str;
+        qDebug() << query.lastError();
+        return false;
+    }
+    admin_id = query.value(0).toString();
+    ui->welcomeLabel->setText(QString("欢迎您，管理员%1！").arg(admin_id));
+    return true;
 }
 
 //获取当前电脑使用/空闲台数

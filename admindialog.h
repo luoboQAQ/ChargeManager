@@ -34,6 +34,7 @@ private slots:
 private:
     bool SetupName();
     bool GetComputerNums();
+    bool GetUserName(QString user);
     bool Q_vNum(QString user, QDate date);
     bool Q_atime(QString user, QDate date);
     bool Q_avgtime(QString user, QDate date);
@@ -45,7 +46,7 @@ private:
     bool L_reloss(QString cardid);
     bool L_fing(QString user);
 
-private:
+private: 
     Ui::AdminDialog *ui;
     bool isAllDate;
     QStandardItemModel model;

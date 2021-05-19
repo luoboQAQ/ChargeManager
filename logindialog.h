@@ -2,9 +2,16 @@
 #define LOGINDIALOG_H
 
 #include <QDialog>
+#include <QMessageBox>
+#include <QSqlQuery>
+#include <QDebug>
+#include <QSqlError>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class LoginDialog; }
+namespace Ui
+{
+    class LoginDialog;
+}
 QT_END_NAMESPACE
 
 class LoginDialog : public QDialog
