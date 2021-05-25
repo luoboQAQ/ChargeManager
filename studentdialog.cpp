@@ -13,7 +13,7 @@ StudentDialog::StudentDialog(QString user, QWidget *parent) : QDialog(parent),
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     querydialog = nullptr;
-    
+
     //设置个人信息区
     userid = user;
     ui->s_NoLabel->setText(user);
@@ -70,6 +70,13 @@ StudentDialog::~StudentDialog()
     if (isOnline)
         on_loginBtn_clicked();
     delete ui;
+}
+
+//窗口关闭事件
+void StudentDialog::closeEvent(QCloseEvent *event)
+{
+    LoginDialog *login = new LoginDialog;
+    login->show();
 }
 
 //上下机槽函数
