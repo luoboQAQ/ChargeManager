@@ -1,8 +1,9 @@
 #ifndef STUDENTDIALOG_H
 #define STUDENTDIALOG_H
 
-#include "squerydialog.h"
 #include "logindialog.h"
+#include "squerydialog.h"
+#include <QCloseEvent>
 #include <QDateTime>
 #include <QDebug>
 #include <QDialog>
@@ -12,7 +13,6 @@
 #include <QSqlQuery>
 #include <QTime>
 #include <QTimer>
-#include <QCloseEvent>
 
 namespace Ui
 {
