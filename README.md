@@ -96,15 +96,16 @@ DELIMITER ;
 
 
 
-### 用户表
+### 管理员表
 
 #### 建表语句
 
 ```sql
-CREATE TABLE `sa` (
-  `user` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  PRIMARY KEY (`user`)
+CREATE TABLE `admin` (
+  `aid` char(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `aname` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `apasswd` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`aid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
@@ -195,5 +196,21 @@ BEGIN
 	END CASE;
 END$
 DELIMITER ;
+```
+
+## 视图的设置
+
+### 登录视图
+
+#### 建立语句
+
+```sql
+DROP VIEW IF EXISTS login;
+CREATE VIEW login AS 
+	SELECT sno AS user,spasswd AS passwd,1 AS tag 
+	FROM student
+UNION
+	SELECT aid AS user,apasswd AS passwd,0 AS tag 
+	FROM admin;
 ```
 

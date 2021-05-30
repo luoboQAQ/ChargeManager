@@ -1,7 +1,9 @@
 #ifndef STUDENTDIALOG_H
 #define STUDENTDIALOG_H
 
+#include "logindialog.h"
 #include "squerydialog.h"
+#include <QCloseEvent>
 #include <QDateTime>
 #include <QDebug>
 #include <QDialog>
@@ -24,6 +26,9 @@ class StudentDialog : public QDialog
 public:
     explicit StudentDialog(QString user, QWidget *parent = nullptr);
     ~StudentDialog();
+
+protected:
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void on_loginBtn_clicked();

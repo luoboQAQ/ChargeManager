@@ -1,17 +1,18 @@
 #ifndef SQUERYDIALOG_H
 #define SQUERYDIALOG_H
 
-#include <QDialog>
 #include <QCloseEvent>
 #include <QDebug>
-#include <QStringList>
+#include <QDialog>
 #include <QMessageBox>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QStandardItemModel>
+#include <QStringList>
+
 namespace Ui
 {
-    class SQueryDialog; 
+    class SQueryDialog;
 }
 
 class SQueryDialog : public QDialog
@@ -38,15 +39,15 @@ private:
     QStandardItemModel model;
     QString admin_id;
     QString cardid;
+
 private:
-  
     bool GetUserName(QString user);
-    bool Q_vNum( QDate date);
+    bool Q_vNum(QDate date);
     bool Q_atime(QDate date);
-    bool Q_avgtime( QDate date);
+    bool Q_avgtime(QDate date);
     bool Q_charge(QDate date);
     bool Q_income(QDate date);
-    bool Q_loss( QDate date);
+    bool Q_loss(QDate date);
     bool SetModel(QSqlQuery &query, QStringList &title);
 };
 

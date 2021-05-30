@@ -1,6 +1,8 @@
 #ifndef ADMINDIALOG_H
 #define ADMINDIALOG_H
 
+#include "logindialog.h"
+#include <QCloseEvent>
 #include <QDialog>
 #include <QDebug>
 #include <QStringList>
@@ -21,6 +23,9 @@ class AdminDialog : public QDialog
 public:
     explicit AdminDialog(QString user, QWidget *parent = nullptr);
     ~AdminDialog();
+
+protected:
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void on_i_Btn_clicked();
@@ -46,7 +51,7 @@ private:
     bool L_reloss(QString cardid);
     bool L_fing(QString user);
 
-private: 
+private:
     Ui::AdminDialog *ui;
     bool isAllDate;
     QStandardItemModel model;

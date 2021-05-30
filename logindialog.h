@@ -1,11 +1,13 @@
 #ifndef LOGINDIALOG_H
 #define LOGINDIALOG_H
 
+#include "admindialog.h"
+#include "studentdialog.h"
+#include <QDebug>
 #include <QDialog>
 #include <QMessageBox>
-#include <QSqlQuery>
-#include <QDebug>
 #include <QSqlError>
+#include <QSqlQuery>
 
 QT_BEGIN_NAMESPACE
 namespace Ui

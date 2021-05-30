@@ -7,7 +7,7 @@ AdminDialog::AdminDialog(QString user, QWidget *parent) : QDialog(parent),
     // 设置窗体有最小化按钮
     Qt::WindowFlags windowFlag = Qt::Dialog;
     windowFlag |= Qt::WindowMinimizeButtonHint;
-    windowFlag |= Qt::WindowCloseButtonHint; 
+    windowFlag |= Qt::WindowCloseButtonHint;
     setWindowFlags(windowFlag);
     ui->setupUi(this);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置表为不可编辑
@@ -20,6 +20,13 @@ AdminDialog::AdminDialog(QString user, QWidget *parent) : QDialog(parent),
 AdminDialog::~AdminDialog()
 {
     delete ui;
+}
+
+//窗口关闭事件
+void AdminDialog::closeEvent(QCloseEvent *event)
+{
+    LoginDialog *login = new LoginDialog;
+    login->show();
 }
 
 //获取管理员姓名
