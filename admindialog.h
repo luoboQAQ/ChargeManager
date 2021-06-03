@@ -36,9 +36,12 @@ private slots:
 
     void on_i_checkBox_stateChanged(int arg1);
 
+    void on_m_QueryBtn_clicked();
+
 private:
     bool SetupName();
     bool GetComputerNums();
+    bool GetQuery(QString &str, QSqlQuery &query);
     bool GetUserName(QString user);
     bool Q_vNum(QString user, QDate date);
     bool Q_atime(QString user, QDate date);

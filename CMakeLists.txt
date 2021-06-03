@@ -36,10 +36,15 @@ FILE(GLOB UI_FILES "./*.ui")
 #同理，查找当前文件夹中所有的资源文件
 # FILE(GLOB QRC_FILES "./*.qrc")
 
-set(PROJECT_SOURCES ${SRC_FILES} ${HEAD_FILES} ${UI_FILES} win.rc)
+set(PROJECT_SOURCES 
+    ${SRC_FILES} 
+    ${HEAD_FILES} 
+    ${UI_FILES} 
+    win.rc)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(ChargeManager
+        # WIN32
         ${PROJECT_SOURCES}
     )
 else()
