@@ -24,6 +24,7 @@ void UserChangeDialog::SetAble(int arg)
     ui->m_PasswdEdit->setEnabled(enable);
     ui->m_CardidEdit->setEnabled(enable);
     ui->m_SdcEdit->setEnabled(enable);
+    ui->m_ClassEdit->setEnabled(enable);
     ui->m_SBox->setEnabled(enable);
     ui->m_CBox->setEnabled(enable);
 }
@@ -62,6 +63,42 @@ void UserChangeDialog::on_m_yesBtn_clicked()
 {
 }
 
+//点击自动补全按钮
 void UserChangeDialog::on_m_autoBtn_clicked()
 {
+    if (choose != 1)
+        return;
+    QString sno = ui->m_SnoEdit->text();
+    if (sno.isEmpty())
+        return;
+    QSqlQuery query;
+    QString str = QString("SELECT sname,sdc,sclass,sage,ssex "
+                          "FROM student "
+                          "WHERE sno='%1'")
+                      .arg(sno);
+    if (!GetQuery(str, query))
+        return;
+    ui->m_NameEdit->setText(query.value(0).toString());
+
+    ui->m_SdcEdit->setText(query.value(1).toString());
+    ui->m_ClassEdit->setText(query.value(2).toString());
+    ui->m_SBox->setValue(query.value(3).toInt());
+    ui->m_CBox->setCurrentText(query.value(4).toString());
+    str = QString("SELECT cardid FROM card WHERE sno='%1'").arg(sno);
+    if (!GetQuery(str, query))
+        return;
+    ui->m_CardidEdit->setText(query.value(0).toString());
+}
+
+//执行SQL语句
+bool UserChangeDialog::GetQuery(QString &str, QSqlQuery &query)
+{
+    if (!query.exec(str) || !query.next())
+    {
+        qDebug("查询失败！");
+        qDebug() << str;
+        qDebug() << query.lastError();
+        return false;
+    }
+    return true;
 }

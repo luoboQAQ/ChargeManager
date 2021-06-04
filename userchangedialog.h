@@ -33,10 +33,11 @@ private slots:
 
 private:
     void SetAble(int arg);
+    bool GetQuery(QString &str, QSqlQuery &query);
 
 private:
     Ui::UserChangeDialog *ui;
-    int choose;
+    int choose = -1;
 };
 
 #endif // USERCHANGEDIALOG_H
