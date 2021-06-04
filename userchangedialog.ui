@@ -118,7 +118,7 @@
       <widget class="QSpinBox" name="m_SBox"/>
      </item>
      <item row="0" column="1">
-      <widget class="QRadioButton" name="radioButton">
+      <widget class="QRadioButton" name="m_changeRBtn">
        <property name="text">
         <string>修改</string>
        </property>
@@ -128,17 +128,17 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="0">
-      <widget class="QPushButton" name="m_autoBtn">
-       <property name="text">
-        <string>自动补全</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
       <widget class="QPushButton" name="m_yesBtn">
        <property name="text">
         <string>确认</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="m_autoBtn">
+       <property name="text">
+        <string>自动补全</string>
        </property>
       </widget>
      </item>

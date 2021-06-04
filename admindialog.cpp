@@ -11,7 +11,7 @@ AdminDialog::AdminDialog(QString user, QWidget *parent) : QDialog(parent),
     setWindowFlags(windowFlag);
     ui->setupUi(this);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置表为不可编辑
-
+    admin_id = user;
     SetupName();
     GetComputerNums();
     GetUserName(user);
@@ -33,10 +33,11 @@ void AdminDialog::closeEvent(QCloseEvent *event)
 bool AdminDialog::GetUserName(QString user)
 {
     QSqlQuery query;
+    QString name;
     QString str = QString("SELECT aname FROM admin WHERE aid='%1'").arg(user);
     GetQuery(str, query);
-    admin_id = query.value(0).toString();
-    ui->welcomeLabel->setText(QString("欢迎您，管理员%1！").arg(admin_id));
+    name = query.value(0).toString();
+    ui->welcomeLabel->setText(QString("欢迎您，管理员%1！").arg(name));
     return true;
 }
 
@@ -469,6 +470,6 @@ void AdminDialog::on_m_QueryBtn_clicked()
 //点击学生管理按钮
 void AdminDialog::on_m_addBtn_clicked()
 {
-    UserChangeDialog *userdialog = new UserChangeDialog;
+    UserChangeDialog *userdialog = new UserChangeDialog(admin_id, this);
     userdialog->show();
 }
