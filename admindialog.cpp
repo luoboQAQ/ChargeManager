@@ -152,8 +152,6 @@ bool AdminDialog::Q_atime(QString user, QDate date)
 
     QStringList title = {"上机总时长"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -161,7 +159,7 @@ bool AdminDialog::Q_atime(QString user, QDate date)
 bool AdminDialog::Q_avgtime(QString user, QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT SEC_TO_TIME(AVG(TIME_TO_SEC(ctime))) FROM record WHERE 1=1;";
+    QString str = "SELECT SEC_TO_TIME(AVG(TIME_TO_SEC(ctime))) FROM record WHERE 1=1";
     if (!user.isNull())
         str += QString(" AND cardid='%1'").arg(user);
     if (!date.isNull())
@@ -173,8 +171,6 @@ bool AdminDialog::Q_avgtime(QString user, QDate date)
     GetQuery(str, query);
     QStringList title = {"上机平均时长"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -189,7 +185,7 @@ bool AdminDialog::Q_charge(QString user, QDate date)
     {
         QString startdate = date.toString("yyyy-MM-dd");
         QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString(" AND ctime>='%1' AND ctime<='%2'").arg(startdate).arg(enddate);
     }
     if (!query.exec(str))
     {
@@ -200,8 +196,6 @@ bool AdminDialog::Q_charge(QString user, QDate date)
     }
     QStringList title = {"充值时间", "卡号", "充值金额", "操作者ID"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -229,8 +223,6 @@ bool AdminDialog::Q_loss(QString user, QDate date)
     }
     QStringList title = {"卡号", "流水号", "操作者ID", "操作码"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -250,8 +242,6 @@ bool AdminDialog::Q_income(QString user, QDate date)
     GetQuery(str, query);
     QStringList title = {"收入"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -271,8 +261,7 @@ bool AdminDialog::Q_vNum(QString user, QDate date)
     GetQuery(str, query);
     QStringList title = {"上机次数"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
+
     return true;
 }
 
@@ -288,6 +277,8 @@ bool AdminDialog::SetModel(QSqlQuery &query, QStringList &title)
     if (!query.first())
     {
         qDebug("此查询为空表");
+        ui->tableView->setModel(&model);
+        ui->tableView->resizeColumnsToContents();
         return true;
     }
     int row = 0; //行
@@ -297,6 +288,8 @@ bool AdminDialog::SetModel(QSqlQuery &query, QStringList &title)
             model.setItem(row, i, new QStandardItem(query.value(i).toString()));
         row++;
     } while (query.next());
+    ui->tableView->setModel(&model);
+    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -466,4 +459,16 @@ bool AdminDialog::GetQuery(QString &str, QSqlQuery &query)
 //点击学生信息查询按钮
 void AdminDialog::on_m_QueryBtn_clicked()
 {
+    QSqlQuery query;
+    QString str("SELECT sno,sname,sdc,sclass,sage,ssex FROM student");
+    GetQuery(str, query);
+    QStringList list = {"学号", "姓名", "系别", "班级", "年龄", "性别"};
+    SetModel(query, list);
+}
+
+//点击学生管理按钮
+void AdminDialog::on_m_addBtn_clicked()
+{
+    UserChangeDialog *userdialog = new UserChangeDialog;
+    userdialog->show();
 }

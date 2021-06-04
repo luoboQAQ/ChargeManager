@@ -273,7 +273,7 @@
         <item>
          <widget class="QPushButton" name="m_addBtn">
           <property name="text">
-           <string>插入/删除</string>
+           <string>增/删/改</string>
           </property>
          </widget>
         </item>

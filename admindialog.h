@@ -2,6 +2,7 @@
 #define ADMINDIALOG_H
 
 #include "logindialog.h"
+#include "userchangedialog.h"
 #include <QCloseEvent>
 #include <QDialog>
 #include <QDebug>
@@ -37,6 +38,8 @@ private slots:
     void on_i_checkBox_stateChanged(int arg1);
 
     void on_m_QueryBtn_clicked();
+
+    void on_m_addBtn_clicked();
 
 private:
     bool SetupName();
