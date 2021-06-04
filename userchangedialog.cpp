@@ -59,8 +59,38 @@ void UserChangeDialog::on_m_addRBtn_clicked()
     }
 }
 
+//添加学生信息
+void UserChangeDialog::AddStu()
+{
+}
+
+//修改学生信息
+void UserChangeDialog::ChangeStu()
+{
+}
+
+//删除学生信息
+void UserChangeDialog::DelStu()
+{
+}
+
+//点击确认按钮
 void UserChangeDialog::on_m_yesBtn_clicked()
 {
+    switch (choose)
+    {
+    case 0:
+        AddStu();
+        break;
+    case 1:
+        ChangeStu();
+        break;
+    case 2:
+        DelStu();
+        break;
+    default:
+        break;
+    }
 }
 
 //点击自动补全按钮
@@ -79,7 +109,6 @@ void UserChangeDialog::on_m_autoBtn_clicked()
     if (!GetQuery(str, query))
         return;
     ui->m_NameEdit->setText(query.value(0).toString());
-
     ui->m_SdcEdit->setText(query.value(1).toString());
     ui->m_ClassEdit->setText(query.value(2).toString());
     ui->m_SBox->setValue(query.value(3).toInt());
