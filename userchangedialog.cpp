@@ -92,7 +92,7 @@ void UserChangeDialog::AddStu()
     QString sdc = ui->m_SdcEdit->text();
     if (sdc.isEmpty())
     {
-        QMessageBox::warning(this, "错误", "系别不能为空！");
+        QMessageBox::warning(this, "错误", "专业不能为空！");
         return;
     }
     QString sclass = ui->m_ClassEdit->text();
@@ -113,6 +113,55 @@ void UserChangeDialog::AddStu()
               .arg(sclass)
               .arg(sage)
               .arg(ssex);
+    if (!query.exec(str))
+    {
+        QString err = query.lastError().databaseText();
+        if (err.indexOf("student.PRIMARY") >= 0)
+        {
+            QMessageBox::warning(this, "错误", "学号重复！");
+            return;
+        }
+        else
+        {
+            QMessageBox::warning(this, "错误", err);
+            return;
+        }
+    }
+    QDateTime current_time = QDateTime::currentDateTime();
+    QString createday = current_time.toString("yyyy-MM-ddThh:mm:ss");
+    str = QString("INSERT INTO card(cardid,createday,sno,banlance,state) "
+                  "VALUES('%1','%2','%3',0,1)")
+              .arg(cardid)
+              .arg(createday)
+              .arg(sno);
+    if (!query.exec(str))
+    {
+        QString err = query.lastError().databaseText();
+        if (err.indexOf("card.PRIMARY") >= 0)
+            QMessageBox::warning(this, "错误", "卡号重复！");
+        else
+            QMessageBox::warning(this, "错误", err);
+
+        //回滚插入
+        str = QString("DELETE FROM student WHERE sno='%1'").arg(sno);
+        if (!query.exec(str))
+            qDebug("回滚失败！");
+        return;
+    }
+
+    str = QString("INSERT INTO user_record(stime,aid,change_way,sno) "
+                  "VALUES('%1','%2','0','%3')")
+              .arg(createday)
+              .arg(admin_id)
+              .arg(sno);
+    if (!query.exec(str))
+    {
+        qDebug("插入记录失败！");
+        qDebug() << str;
+        qDebug() << query.lastError();
+        return;
+    }
+    QMessageBox::information(this, "提示", "插入成功！");
 }
 
 //修改学生信息
