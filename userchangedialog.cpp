@@ -5,6 +5,7 @@ UserChangeDialog::UserChangeDialog(QString aid, QWidget *parent) : QDialog(paren
                                                                    ui(new Ui::UserChangeDialog)
 {
     ui->setupUi(this);
+    admin_id=aid;
 }
 
 UserChangeDialog::~UserChangeDialog()
@@ -37,6 +38,7 @@ void UserChangeDialog::on_m_delRBtn_clicked()
         choose = 2;
         SetAble(0);
     }
+    
 }
 
 //点击修改选项
@@ -71,7 +73,65 @@ void UserChangeDialog::ChangeStu()
 
 //删除学生信息
 void UserChangeDialog::DelStu()
-{
+{ QString sno = ui->m_SnoEdit->text();
+    QSqlQuery query;
+    QString str = QString("SELECT * FROM student WHERE sno=%1").arg(sno);
+      if (!query.exec(str))
+    {
+        qDebug("查询学生信息失败！");
+        qDebug() << str;
+        qDebug() << query.lastError();
+        return ;
+    }
+    if (!query.next())
+    {
+        QMessageBox::information(this, "提示", "没有该学号！");
+        return ;
+    }
+
+
+    str = QString("SELECT is_using FROM record,card WHERE sno=%1 AND is_using=1").arg(sno);
+    if (!query.exec(str))
+    {
+        qDebug("查询上机状态失败！");
+        qDebug() << str;
+        qDebug() << query.lastError();
+        return ;
+    }
+    if (query.next())
+    {
+        QMessageBox::information(this, "提示", "上机状态下不能删除！");
+        return ;
+    }
+    if (QMessageBox::question(this, "删除", "你是否确定要删除？",
+                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+        return ;
+
+    str=QString("DELETE FROM user_record "
+                  "WHERE sno='%1'").arg(sno);
+        if (!query.exec(str))
+    {
+        QMessageBox::warning(this, "错误", "删除失败！");
+        qDebug() << query.lastError();
+        return ;
+    }
+    QMessageBox::information(this, "提示", "删除成功！");
+    return ;
+    QDateTime current_time = QDateTime::currentDateTime();
+    QString stime = current_time.toString("yyyy-MM-ddThh:mm:ss");
+    str = QString("INSERT INTO  user_record "
+                  "VALUES('%1','%2','0','%3')")
+              .arg(stime)
+              .arg(admin_id)
+              .arg(sno);
+    if (!query.exec(str))
+    {
+        QMessageBox::warning(this, "错误", "更新失败！");
+        qDebug() << query.lastError();
+        return ;
+    }
+    QMessageBox::information(this, "提示", "更新成功！");
+    return ;
 }
 
 //点击确认按钮

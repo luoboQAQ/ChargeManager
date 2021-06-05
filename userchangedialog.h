@@ -6,7 +6,14 @@
 #include <QCloseEvent>
 #include <QSqlQuery>
 #include <QSqlError>
-
+#include <QDialog>
+#include <QStringList>
+#include <QMessageBox>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QStandardItemModel>
+#include <QTime>
+#include <QTimer>
 namespace Ui
 {
     class UserChangeDialog;
@@ -30,7 +37,12 @@ private slots:
     void on_m_yesBtn_clicked();
 
     void on_m_autoBtn_clicked();
+    
+    void DelStu();
 
+    void ChangeStu();
+
+    void AddStu();
 private:
     void SetAble(int arg);
     bool GetQuery(QString &str, QSqlQuery &query);
@@ -38,6 +50,7 @@ private:
 private:
     Ui::UserChangeDialog *ui;
     int choose = -1;
+    QString admin_id;
 };
 
 #endif // USERCHANGEDIALOG_H
