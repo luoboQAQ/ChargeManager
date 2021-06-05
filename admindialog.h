@@ -7,6 +7,7 @@
 #include <QDialog>
 #include <QDebug>
 #include <QStringList>
+#include <QTimer>
 #include <QMessageBox>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -43,6 +44,8 @@ private slots:
 
     void DialogClosed();
 
+    void onTimeOut(void);
+
 private:
     bool SetupName();
     bool GetComputerNums();
@@ -65,5 +68,6 @@ private:
     QStandardItemModel model;
     QString admin_id;
     UserChangeDialog *userdialog;
+    QTimer m_timer;
 };
 #endif // ADMINDIALOG_H

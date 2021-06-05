@@ -16,11 +16,18 @@ AdminDialog::AdminDialog(QString user, QWidget *parent) : QDialog(parent),
     SetupName();
     GetComputerNums();
     GetUserName(user);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
+    m_timer.start(10000);
 }
 
 AdminDialog::~AdminDialog()
 {
     delete ui;
+}
+
+void AdminDialog::onTimeOut()
+{
+    GetComputerNums();
 }
 
 //窗口关闭事件

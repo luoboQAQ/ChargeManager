@@ -176,7 +176,8 @@ void UserChangeDialog::AddStu()
 
 //修改学生信息
 void UserChangeDialog::ChangeStu()
-{QString sno = ui->m_SnoEdit->text();
+{
+    QString sno = ui->m_SnoEdit->text();
     QSqlQuery query;
     QString str = QString("SELECT cardid FROM card WHERE sno=%1").arg(sno);
     if (!query.exec(str))
@@ -192,8 +193,8 @@ void UserChangeDialog::ChangeStu()
         return;
     }
     QString cardid = query.value(0).toString();
-     if(!cardid.isEmpty())
-    {str = QString("SELECT is_using FROM record WHERE cardid=%1 AND is_using=1").arg(cardid);
+
+    str = QString("SELECT is_using FROM record WHERE cardid=%1 AND is_using=1").arg(cardid);
     if (!query.exec(str))
     {
         qDebug("查询上机状态失败！");
@@ -205,62 +206,57 @@ void UserChangeDialog::ChangeStu()
     {
         QMessageBox::information(this, "提示", "上机状态下不能修改！");
         return;
-    }}
+    }
     if (QMessageBox::question(this, "修改", "你是否确定要修改？",
                               QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
         return;
-    
+
     QString sname = ui->m_NameEdit->text();
     QString spasswd = ui->m_PasswdEdit->text();
-    QString scardid = ui->m_CardidEdit->text(); 
-    str=QString("SELEXT * FROM card WHERE cardid='%1';").arg(scardid);
-      if (query.exec(str))
+    QString scardid = ui->m_CardidEdit->text();
+    str = QString("SELEXT * FROM card WHERE cardid='%1'").arg(scardid);
+    if (query.exec(str))
     {
         QMessageBox::warning(this, "错误", "卡号有重复！");
-        qDebug() << query.lastError();
         return;
     }
-     str=QString("SELECT cardid FROM card WHERE sno='%1'").arg(sno);
-      if (!GetQuery(str, query))
-        return;
-        if(scardid.isEmpty())
-        scardid=query.value(0).toString();
+    if (scardid.isEmpty())
+        scardid = cardid;
     QString sdc = ui->m_SdcEdit->text();
     QString scl = ui->m_ClassEdit->text();
     int sage = ui->m_SBox->value();
     QString ssex = ui->m_CBox->currentText();
-     
-      str = QString("SELECT sname,sdc,sclass,sage,ssex,spasswd "
-                          "FROM student "
-                          "WHERE sno='%1'")
-                      .arg(sno);
+
+    str = QString("SELECT sname,sdc,sclass,sage,ssex,spasswd "
+                  "FROM student "
+                  "WHERE sno='%1'")
+              .arg(sno);
     if (!GetQuery(str, query))
         return;
-    if(sname.isEmpty())
-    sname=query.value(0).toString();
-    if(sdc.isEmpty())
-    sdc=query.value(1).toString();
-    if(scl.isEmpty())
-    scl=query.value(2).toString();
-    if(sage=0)
-    sage=query.value(3).toInt();
-    //ui->m_CBox->setCurrentText(query.value(4).toString());
-    if(spasswd.isEmpty())
-    spasswd=query.value(5).toString();
+    if (sname.isEmpty())
+        sname = query.value(0).toString();
+    if (sdc.isEmpty())
+        sdc = query.value(1).toString();
+    if (scl.isEmpty())
+        scl = query.value(2).toString();
+    if (sage == 0)
+        sage = query.value(3).toInt();
+    if (spasswd.isEmpty())
+        spasswd = query.value(5).toString();
     str = QString("UPDATE student SET sname='%1' "
-                 "WHERE sno='%2';"
-                 "UPDATE student SET spasswd='%3' "
-                 "WHERE sno='%2';"
-                "UPDATE student SET sdc='%4' "
-                 "WHERE sno='%2';"
-                 "UPDATE student SET sclass='%5' "
-                 "WHERE sno='%2';"
-                 "UPDATE student SET sage='%6' "
-                 "WHERE sno='%2';"
-                "UPDATE student SET ssex='%7' "
-                 "WHERE sno='%2';"
-                "UPDATE card SET cardid='%8' "
-                 "WHERE sno='%2';")
+                  "WHERE sno='%2';"
+                  "UPDATE student SET spasswd='%3' "
+                  "WHERE sno='%2';"
+                  "UPDATE student SET sdc='%4' "
+                  "WHERE sno='%2';"
+                  "UPDATE student SET sclass='%5' "
+                  "WHERE sno='%2';"
+                  "UPDATE student SET sage='%6' "
+                  "WHERE sno='%2';"
+                  "UPDATE student SET ssex='%7' "
+                  "WHERE sno='%2';"
+                  "UPDATE card SET cardid='%8' "
+                  "WHERE sno='%2';")
               .arg(sname)
               .arg(sno)
               .arg(spasswd)
@@ -275,16 +271,6 @@ void UserChangeDialog::ChangeStu()
         qDebug() << query.lastError();
         return;
     }
-    // str=QString(" UPDATE card SET cardid='%1'"
-    //              "WHERE sno='%2';")
-    //              .arg(scardid)
-    //              .arg(sno);
-    //   if (!query.exec(str))
-    // {
-    //     QMessageBox::warning(this, "错误", "修改失败！");
-    //     qDebug() << query.lastError();
-    //     return;
-    // }
     QDateTime current_time = QDateTime::currentDateTime();
     QString stime = current_time.toString("yyyy-MM-ddThh:mm:ss");
     str = QString("INSERT INTO  user_record(stime,aid,change_way,sno) "
@@ -299,7 +285,6 @@ void UserChangeDialog::ChangeStu()
         return;
     }
     QMessageBox::information(this, "提示", "修改成功！");
-
 }
 
 //删除学生信息

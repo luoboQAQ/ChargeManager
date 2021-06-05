@@ -67,8 +67,6 @@ StudentDialog::StudentDialog(QString user, QWidget *parent) : QDialog(parent),
 
 StudentDialog::~StudentDialog()
 {
-    if (isOnline)
-        on_loginBtn_clicked();
     delete ui;
 }
 
@@ -77,6 +75,8 @@ void StudentDialog::closeEvent(QCloseEvent *event)
 {
     LoginDialog *login = new LoginDialog;
     login->show();
+    if (isOnline)
+        on_loginBtn_clicked();
 }
 
 //上下机槽函数
