@@ -111,6 +111,15 @@ void UserChangeDialog::AddStu()
     int sage = ui->m_SBox->value();
     QString ssex = ui->m_CBox->currentText();
 
+    QSqlQuery query_insert_s;
+    QSqlQuery query_insert_c;
+    QSqlQuery query_insert_l;
+    QSqlQuery query_do;
+    bool ok1 = true;
+    bool ok2 = true;
+    bool ok3 = true;
+    query.exec("SET AUTOCOMMIT=0");  //设置为不自动提交，因为MYSQL默认立即执行
+    query.exec("START TRANSACTION"); //开始事务
     str = QString("INSERT INTO student(sno,sname,spasswd,sdc,sclass,sage,ssex) "
                   "VALUES('%1','%2','%3','%4','%5','%6','%7')")
               .arg(sno)
@@ -120,20 +129,16 @@ void UserChangeDialog::AddStu()
               .arg(sclass)
               .arg(sage)
               .arg(ssex);
-    if (!query.exec(str))
+    if (!query_insert_s.exec(str))
     {
-        QString err = query.lastError().databaseText();
+        QString err = query_insert_s.lastError().databaseText();
         if (err.indexOf("student.PRIMARY") >= 0)
-        {
             QMessageBox::warning(this, "错误", "学号重复！");
-            return;
-        }
         else
-        {
             QMessageBox::warning(this, "错误", err);
-            return;
-        }
+        ok1 = false;
     }
+
     QDateTime current_time = QDateTime::currentDateTime();
     QString createday = current_time.toString("yyyy-MM-ddThh:mm:ss");
     str = QString("INSERT INTO card(cardid,createday,sno,banlance,state) "
@@ -141,19 +146,14 @@ void UserChangeDialog::AddStu()
               .arg(cardid)
               .arg(createday)
               .arg(sno);
-    if (!query.exec(str))
+    if (!query_insert_c.exec(str))
     {
-        QString err = query.lastError().databaseText();
+        QString err = query_insert_c.lastError().databaseText();
         if (err.indexOf("card.PRIMARY") >= 0)
             QMessageBox::warning(this, "错误", "卡号重复！");
         else
             QMessageBox::warning(this, "错误", err);
-
-        //回滚插入
-        str = QString("DELETE FROM student WHERE sno='%1'").arg(sno);
-        if (!query.exec(str))
-            qDebug("回滚失败！");
-        return;
+        ok2 = false;
     }
 
     str = QString("INSERT INTO user_record(stime,aid,change_way,sno) "
@@ -161,14 +161,17 @@ void UserChangeDialog::AddStu()
               .arg(createday)
               .arg(admin_id)
               .arg(sno);
-    if (!query.exec(str))
+    ok3 = query_insert_l.exec(str);
+    if (ok1 && ok2 && ok3)
     {
-        qDebug("插入记录失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return;
+        query_do.exec("COMMIT"); //提交
+        QMessageBox::information(this, "提示", "插入成功！");
     }
-    QMessageBox::information(this, "提示", "插入成功！");
+    else
+    {
+        query_do.exec("ROLLBACK"); //回滚
+        QMessageBox::warning(this, "错误", "插入失败！");
+    }
 }
 
 //修改学生信息
