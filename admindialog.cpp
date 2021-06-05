@@ -12,6 +12,7 @@ AdminDialog::AdminDialog(QString user, QWidget *parent) : QDialog(parent),
     ui->setupUi(this);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置表为不可编辑
     admin_id = user;
+    userdialog = nullptr;
     SetupName();
     GetComputerNums();
     GetUserName(user);
@@ -470,6 +471,17 @@ void AdminDialog::on_m_QueryBtn_clicked()
 //点击学生管理按钮
 void AdminDialog::on_m_addBtn_clicked()
 {
-    UserChangeDialog *userdialog = new UserChangeDialog(admin_id, this);
-    userdialog->show();
+    if (userdialog == nullptr)
+    {
+        userdialog = new UserChangeDialog(admin_id, this);
+        connect(userdialog, SIGNAL(windowClosed()), this, SLOT(DialogClosed()));
+        userdialog->show();
+    }
+}
+
+//查询窗口关闭时
+void AdminDialog::DialogClosed()
+{
+    delete userdialog;
+    userdialog = nullptr;
 }

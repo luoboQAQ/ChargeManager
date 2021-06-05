@@ -41,6 +41,8 @@ private slots:
 
     void on_m_addBtn_clicked();
 
+    void DialogClosed();
+
 private:
     bool SetupName();
     bool GetComputerNums();
@@ -62,5 +64,6 @@ private:
     bool isAllDate;
     QStandardItemModel model;
     QString admin_id;
+    UserChangeDialog *userdialog;
 };
 #endif // ADMINDIALOG_H

@@ -6,11 +6,18 @@ UserChangeDialog::UserChangeDialog(QString aid, QWidget *parent) : QDialog(paren
 {
     ui->setupUi(this);
     admin_id = aid;
+    choose = 0;
 }
 
 UserChangeDialog::~UserChangeDialog()
 {
     delete ui;
+}
+
+//关闭窗体事件
+void UserChangeDialog::closeEvent(QCloseEvent *event)
+{
+    emit windowClosed();
 }
 
 //设置文本框可行性

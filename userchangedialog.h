@@ -23,6 +23,12 @@ public:
     explicit UserChangeDialog(QString aid, QWidget *parent = nullptr);
     ~UserChangeDialog();
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
+signals:
+    void windowClosed(); //信号发送函数
+
 private slots:
     void on_m_delRBtn_clicked();
 
@@ -46,7 +52,7 @@ private:
 
 private:
     Ui::UserChangeDialog *ui;
-    int choose = -1;
+    int choose;
     QString admin_id;
 };
 
