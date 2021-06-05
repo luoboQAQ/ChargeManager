@@ -2,10 +2,12 @@
 #define ADMINDIALOG_H
 
 #include "logindialog.h"
+#include "userchangedialog.h"
 #include <QCloseEvent>
 #include <QDialog>
 #include <QDebug>
 #include <QStringList>
+#include <QTimer>
 #include <QMessageBox>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -36,9 +38,18 @@ private slots:
 
     void on_i_checkBox_stateChanged(int arg1);
 
+    void on_m_QueryBtn_clicked();
+
+    void on_m_addBtn_clicked();
+
+    void DialogClosed();
+
+    void onTimeOut(void);
+
 private:
     bool SetupName();
     bool GetComputerNums();
+    bool GetQuery(QString &str, QSqlQuery &query);
     bool GetUserName(QString user);
     bool Q_vNum(QString user, QDate date);
     bool Q_atime(QString user, QDate date);
@@ -56,5 +67,7 @@ private:
     bool isAllDate;
     QStandardItemModel model;
     QString admin_id;
+    UserChangeDialog *userdialog;
+    QTimer m_timer;
 };
 #endif // ADMINDIALOG_H

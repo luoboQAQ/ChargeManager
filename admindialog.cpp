@@ -11,15 +11,23 @@ AdminDialog::AdminDialog(QString user, QWidget *parent) : QDialog(parent),
     setWindowFlags(windowFlag);
     ui->setupUi(this);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置表为不可编辑
-
+    admin_id = user;
+    userdialog = nullptr;
     SetupName();
     GetComputerNums();
     GetUserName(user);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
+    m_timer.start(10000);
 }
 
 AdminDialog::~AdminDialog()
 {
     delete ui;
+}
+
+void AdminDialog::onTimeOut()
+{
+    GetComputerNums();
 }
 
 //窗口关闭事件
@@ -33,16 +41,11 @@ void AdminDialog::closeEvent(QCloseEvent *event)
 bool AdminDialog::GetUserName(QString user)
 {
     QSqlQuery query;
+    QString name;
     QString str = QString("SELECT aname FROM admin WHERE aid='%1'").arg(user);
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return false;
-    }
-    admin_id = query.value(0).toString();
-    ui->welcomeLabel->setText(QString("欢迎您，管理员%1！").arg(admin_id));
+    GetQuery(str, query);
+    name = query.value(0).toString();
+    ui->welcomeLabel->setText(QString("欢迎您，管理员%1！").arg(name));
     return true;
 }
 
@@ -51,22 +54,10 @@ bool AdminDialog::GetComputerNums()
 {
     QSqlQuery query;
     QString str = QString("SELECT COUNT(*) FROM computer WHERE computer_state = '空闲'");
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询空闲电脑状态失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return false;
-    }
+    GetQuery(str, query);
     ui->freeNumLabel->setText(query.value(0).toString());
     str = QString("SELECT COUNT(*) FROM computer WHERE computer_state = '忙碌'");
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询忙碌电脑状态失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return false;
-    }
+    GetQuery(str, query);
     ui->busyNumLabel->setText(query.value(0).toString());
     return true;
 }
@@ -76,13 +67,7 @@ bool AdminDialog::SetupName()
 {
     QSqlQuery query;
     QString str = QString("SELECT sno,sname FROM student LIMIT 0,100");
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询用户名失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return false;
-    }
+    GetQuery(str, query);
     QString arg1, arg2;
     QStringList list = {"所有人"};
     do
@@ -129,13 +114,7 @@ void AdminDialog::on_i_Btn_clicked()
         user = user.split('(').at(0);
         QString str = QString("SELECT cardid FROM card WHERE sno='%1'").arg(user);
         QSqlQuery query;
-        if (!query.exec(str) || !query.next())
-        {
-            qDebug("查询失败！");
-            qDebug() << str;
-            qDebug() << query.lastError();
-            return;
-        }
+        GetQuery(str, query);
         user = query.value(0).toString();
     }
     else
@@ -178,18 +157,10 @@ bool AdminDialog::Q_atime(QString user, QDate date)
         QString enddate = date.addDays(1).toString("yyyy-MM-dd");
         str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
     }
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询上机时长失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return false;
-    }
+    GetQuery(str, query);
 
     QStringList title = {"上机总时长"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -197,7 +168,7 @@ bool AdminDialog::Q_atime(QString user, QDate date)
 bool AdminDialog::Q_avgtime(QString user, QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT SEC_TO_TIME(AVG(TIME_TO_SEC(ctime))) FROM record WHERE 1=1;";
+    QString str = "SELECT SEC_TO_TIME(AVG(TIME_TO_SEC(ctime))) FROM record WHERE 1=1";
     if (!user.isNull())
         str += QString(" AND cardid='%1'").arg(user);
     if (!date.isNull())
@@ -206,17 +177,9 @@ bool AdminDialog::Q_avgtime(QString user, QDate date)
         QString enddate = date.addDays(1).toString("yyyy-MM-dd");
         str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
     }
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询上机时长失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return false;
-    }
+    GetQuery(str, query);
     QStringList title = {"上机平均时长"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -231,7 +194,7 @@ bool AdminDialog::Q_charge(QString user, QDate date)
     {
         QString startdate = date.toString("yyyy-MM-dd");
         QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString(" AND ctime>='%1' AND ctime<='%2'").arg(startdate).arg(enddate);
     }
     if (!query.exec(str))
     {
@@ -242,8 +205,6 @@ bool AdminDialog::Q_charge(QString user, QDate date)
     }
     QStringList title = {"充值时间", "卡号", "充值金额", "操作者ID"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -271,8 +232,6 @@ bool AdminDialog::Q_loss(QString user, QDate date)
     }
     QStringList title = {"卡号", "流水号", "操作者ID", "操作码"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -289,17 +248,9 @@ bool AdminDialog::Q_income(QString user, QDate date)
         QString enddate = date.addDays(1).toString("yyyy-MM-dd");
         str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
     }
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询机房收入失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return false;
-    }
+    GetQuery(str, query);
     QStringList title = {"收入"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -316,17 +267,10 @@ bool AdminDialog::Q_vNum(QString user, QDate date)
         QString enddate = date.addDays(1).toString("yyyy-MM-dd");
         str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
     }
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询上机次数失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return false;
-    }
+    GetQuery(str, query);
     QStringList title = {"上机次数"};
     SetModel(query, title);
-    ui->tableView->setModel(&model);
-    ui->tableView->resizeColumnsToContents();
+
     return true;
 }
 
@@ -342,6 +286,8 @@ bool AdminDialog::SetModel(QSqlQuery &query, QStringList &title)
     if (!query.first())
     {
         qDebug("此查询为空表");
+        ui->tableView->setModel(&model);
+        ui->tableView->resizeColumnsToContents();
         return true;
     }
     int row = 0; //行
@@ -351,6 +297,8 @@ bool AdminDialog::SetModel(QSqlQuery &query, QStringList &title)
             model.setItem(row, i, new QStandardItem(query.value(i).toString()));
         row++;
     } while (query.next());
+    ui->tableView->setModel(&model);
+    ui->tableView->resizeColumnsToContents();
     return true;
 }
 
@@ -374,13 +322,7 @@ void AdminDialog::on_l_Btn_clicked()
     //获取卡ID
     QString str = QString("SELECT cardid FROM card WHERE sno='%1'").arg(user);
     QSqlQuery query;
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return;
-    }
+    GetQuery(str, query);
     QString cardid = query.value(0).toString();
     if (choose == 1)
         L_reloss(cardid);
@@ -393,13 +335,7 @@ bool AdminDialog::L_reloss(QString cardid)
 {
     QSqlQuery query;
     QString str = QString("SELECT state FROM card WHERE cardid=%1").arg(cardid);
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询卡状态失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
-        return false;
-    }
+    GetQuery(str, query);
     QString state = query.value(0).toString();
     if (state == "1")
     {
@@ -428,13 +364,8 @@ int AdminDialog::L_loss(QString cardid)
 {
     QSqlQuery query;
     QString str = QString("SELECT state FROM card WHERE cardid=%1").arg(cardid);
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询卡状态失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
+    if (!GetQuery(str, query))
         return -1;
-    }
     QString state = query.value(0).toString();
     if (state == "0")
     {
@@ -477,19 +408,17 @@ int AdminDialog::L_loss(QString cardid)
 //点击充值按钮
 void AdminDialog::on_c_Btn_clicked()
 {
+    if (QMessageBox::question(this, "充值", "你是否确定要充值？",
+                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+        return;
     int money = ui->c_numSBox->value();
     //获取操作对象
-    QString user = ui->i_userCBox->currentText();
+    QString user = ui->c_userCBox->currentText();
     user = user.split('(').at(0);
     QString str = QString("SELECT cardid FROM card WHERE sno='%1'").arg(user);
     QSqlQuery query;
-    if (!query.exec(str) || !query.next())
-    {
-        qDebug("查询失败！");
-        qDebug() << str;
-        qDebug() << query.lastError();
+    if (!GetQuery(str, query))
         return;
-    }
     QString cardid = query.value(0).toString();
     QDateTime current_time = QDateTime::currentDateTime();
     QString ctime = current_time.toString("yyyy-MM-ddThh:mm:ss");
@@ -521,4 +450,45 @@ void AdminDialog::on_i_checkBox_stateChanged(int arg1)
         ui->i_dateEdit->setEnabled(true);
         isAllDate = true;
     }
+}
+
+//执行SQL语句
+bool AdminDialog::GetQuery(QString &str, QSqlQuery &query)
+{
+    if (!query.exec(str) || !query.next())
+    {
+        qDebug("查询失败！");
+        qDebug() << str;
+        qDebug() << query.lastError();
+        return false;
+    }
+    return true;
+}
+
+//点击学生信息查询按钮
+void AdminDialog::on_m_QueryBtn_clicked()
+{
+    QSqlQuery query;
+    QString str("SELECT sno,sname,sdc,sclass,sage,ssex FROM student");
+    GetQuery(str, query);
+    QStringList list = {"学号", "姓名", "系别", "班级", "年龄", "性别"};
+    SetModel(query, list);
+}
+
+//点击学生管理按钮
+void AdminDialog::on_m_addBtn_clicked()
+{
+    if (userdialog == nullptr)
+    {
+        userdialog = new UserChangeDialog(admin_id, this);
+        connect(userdialog, SIGNAL(windowClosed()), this, SLOT(DialogClosed()));
+        userdialog->show();
+    }
+}
+
+//查询窗口关闭时
+void AdminDialog::DialogClosed()
+{
+    delete userdialog;
+    userdialog = nullptr;
 }
