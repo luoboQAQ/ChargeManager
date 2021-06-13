@@ -221,7 +221,9 @@ CREATE TABLE `user_record` (
   `sno` char(5) DEFAULT NULL,
   PRIMARY KEY (`stime`,`aid`),
   KEY `aid` (`aid`),
-  CONSTRAINT `user_record_ibfk_1` FOREIGN KEY (`aid`) REFERENCES `admin` (`aid`)
+  KEY `sno` (`sno`),
+  CONSTRAINT `user_record_ibfk_1` FOREIGN KEY (`aid`) REFERENCES `admin` (`aid`),
+  CONSTRAINT `user_record_ibfk_2` FOREIGN KEY (`sno`) REFERENCES `student` (`sno`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
