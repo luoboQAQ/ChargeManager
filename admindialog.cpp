@@ -293,7 +293,12 @@ bool AdminDialog::SetModel(QSqlQuery &query, QStringList &title)
     do
     {
         for (int i = 0; i < maxColumn; i++)
-            model.setItem(row, i, new QStandardItem(query.value(i).toString()));
+        {
+            QString value = query.value(i).toString();
+            if (value.length() == 0)
+                value = '0';
+            model.setItem(row, i, new QStandardItem(value));
+        }
         row++;
     } while (query.next());
     ui->tableView->setModel(&model);
