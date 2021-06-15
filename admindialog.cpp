@@ -151,14 +151,13 @@ void AdminDialog::on_i_Btn_clicked()
 bool AdminDialog::Q_atime(QString user, QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(ctime))) FROM record WHERE 1=1";
+    QString str = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(sumtime))) FROM sumtime WHERE 1=1";
     if (!user.isNull())
         str += QString(" AND cardid='%1'").arg(user);
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString("  AND day_time='%1'").arg(startdate);
     }
     GetQuery(str, query);
 
@@ -171,14 +170,13 @@ bool AdminDialog::Q_atime(QString user, QDate date)
 bool AdminDialog::Q_avgtime(QString user, QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT SEC_TO_TIME(AVG(TIME_TO_SEC(ctime))) FROM record WHERE 1=1";
+    QString str = "SELECT SEC_TO_TIME(AVG(TIME_TO_SEC(avgtime))) FROM avgtime WHERE 1=1";
     if (!user.isNull())
         str += QString(" AND cardid='%1'").arg(user);
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString("  AND day_time='%1'").arg(startdate);
     }
     GetQuery(str, query);
     QStringList title = {"上机平均时长"};
@@ -242,14 +240,13 @@ bool AdminDialog::Q_loss(QString user, QDate date)
 bool AdminDialog::Q_income(QString user, QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT SUM(cost) FROM record WHERE is_using=0";
+    QString str = "SELECT SUM(sumcost) FROM sumcost WHERE 1=1";
     if (!user.isNull())
         str += QString(" AND cardid='%1'").arg(user);
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString(" AND day_time='%1' ").arg(startdate);
     }
     GetQuery(str, query);
     QStringList title = {"收入"};
@@ -261,14 +258,13 @@ bool AdminDialog::Q_income(QString user, QDate date)
 bool AdminDialog::Q_vNum(QString user, QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT COUNT(*) FROM record WHERE is_using=0";
+    QString str = "SELECT SUM(times) FROM times WHERE 1=1";
     if (!user.isNull())
         str += QString(" AND cardid='%1'").arg(user);
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString(" AND day_time='%1'").arg(startdate);
     }
     GetQuery(str, query);
     QStringList title = {"上机次数"};
