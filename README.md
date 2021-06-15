@@ -16,8 +16,8 @@ CREATE TABLE `card` (
   `banlance` double DEFAULT NULL,
   `state` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`cardid`),
-  KEY `sno` (`sno`),
-  CONSTRAINT `card_ibfk_1` FOREIGN KEY (`sno`) REFERENCES `student` (`sno`)
+  KEY `card_ibfk_1` (`sno`),
+  CONSTRAINT `card_ibfk_1` FOREIGN KEY (`sno`) REFERENCES `student` (`sno`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
@@ -64,7 +64,9 @@ CREATE TABLE `record` (
   `is_using` tinyint(1) NOT NULL,
   PRIMARY KEY (`serial_num`),
   KEY `cardid` (`cardid`),
-  CONSTRAINT `record_ibfk_1` FOREIGN KEY (`cardid`) REFERENCES `card` (`cardid`) ON DELETE RESTRICT
+  KEY `computer_id` (`computer_id`),
+  CONSTRAINT `record_ibfk_1` FOREIGN KEY (`cardid`) REFERENCES `card` (`cardid`) ON DELETE RESTRICT,
+  CONSTRAINT `record_ibfk_2` FOREIGN KEY (`computer_id`) REFERENCES `computer` (`computer_id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
@@ -109,6 +111,12 @@ CREATE TABLE `admin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
+#### 测试数据
+
+```sql
+INSERT INTO `chm`.`admin` (`aid`, `aname`, `apasswd`) VALUES ('001', 'admin', '001');
+```
+
 ### 学生表
 
 #### 建表语句
@@ -117,6 +125,7 @@ CREATE TABLE `admin` (
 CREATE TABLE `student` (
   `sno` char(5) NOT NULL,
   `sname` varchar(10) DEFAULT NULL,
+  `spasswd` varchar(20) NOT NULL,
   `sdc` varchar(10) DEFAULT NULL,
   `sclass` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `sage` int DEFAULT NULL,
@@ -128,7 +137,7 @@ CREATE TABLE `student` (
 #### 测试数据插入
 
 ```sql
-INSERT INTO `chm`.`student` (`sno`, `sname`, `sdc`, `sclass`, `sage`, `ssex`) VALUES ('20001', '小红', '计算机', '1901', 20, '女');
+INSERT INTO `chm`.`student` (`sno`, `sname`, `spasswd`, `sdc`, `sclass`, `sage`, `ssex`) VALUES ('20001', '小红', '123', '计算机', '1901', 20, '女');
 ```
 
 ### 挂失记录表
@@ -138,10 +147,12 @@ INSERT INTO `chm`.`student` (`sno`, `sname`, `sdc`, `sclass`, `sage`, `ssex`) VA
 ```sql
 CREATE TABLE `loss_record` (
   `ltime` datetime NOT NULL,
-  `cardid` char(5) DEFAULT NULL,
+  `cardid` char(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `opeartor_id` char(5) DEFAULT NULL,
   `state` tinyint(1) DEFAULT NULL,
-  PRIMARY KEY (`ltime`)
+  PRIMARY KEY (`ltime`,`cardid`) USING BTREE,
+  KEY `cardid` (`cardid`),
+  CONSTRAINT `loss_record_ibfk_1` FOREIGN KEY (`cardid`) REFERENCES `card` (`cardid`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
@@ -163,8 +174,6 @@ END$
 DELIMITER ;
 ```
 
-
-
 ### 充值记录表
 
 #### 建表语句
@@ -176,7 +185,9 @@ CREATE TABLE `charge_record` (
   `money` double NOT NULL,
   `opeartor_id` char(5) NOT NULL,
   `state` int NOT NULL,
-  PRIMARY KEY (`ctime`) USING BTREE
+  PRIMARY KEY (`ctime`,`cardid`) USING BTREE,
+  KEY `cardid` (`cardid`),
+  CONSTRAINT `charge_record_ibfk_1` FOREIGN KEY (`cardid`) REFERENCES `card` (`cardid`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
@@ -198,6 +209,24 @@ END$
 DELIMITER ;
 ```
 
+### 用户操作记录表
+
+#### 建表语句
+
+```sql
+CREATE TABLE `user_record` (
+  `stime` datetime NOT NULL,
+  `aid` char(5) NOT NULL,
+  `change_way` int DEFAULT NULL,
+  `sno` char(5) DEFAULT NULL,
+  PRIMARY KEY (`stime`,`aid`),
+  KEY `aid` (`aid`),
+  KEY `sno` (`sno`),
+  CONSTRAINT `user_record_ibfk_1` FOREIGN KEY (`aid`) REFERENCES `admin` (`aid`),
+  CONSTRAINT `user_record_ibfk_2` FOREIGN KEY (`sno`) REFERENCES `student` (`sno`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+```
+
 ## 视图的设置
 
 ### 登录视图
@@ -214,3 +243,58 @@ UNION
 	FROM admin;
 ```
 
+### 总花费视图
+
+#### 建立语句
+
+```sql
+DROP VIEW IF EXISTS sumcost;
+CREATE VIEW sumcost AS
+SELECT cardid,DATE_FORMAT(stime, '%Y-%m-%d') day_time,SUM(cost) AS sumcost
+FROM record 
+WHERE is_using = 0 
+GROUP BY cardid,day_time
+ORDER BY cardid ASC,day_time ASC;
+```
+
+### 上机总时长视图
+
+#### 建立语句
+
+```sql
+DROP VIEW IF EXISTS sumtime;
+CREATE VIEW sumtime AS
+SELECT cardid,DATE_FORMAT(stime, '%Y-%m-%d') day_time,SEC_TO_TIME(SUM(TIME_TO_SEC(ctime))) AS sumtime
+FROM record
+WHERE is_using=0
+GROUP BY cardid,day_time
+ORDER BY cardid ASC,day_time ASC;
+```
+
+### 平均使用时长视图
+
+#### 建立语句
+
+```sql
+DROP VIEW IF EXISTS avgtime;
+CREATE VIEW avgtime AS
+SELECT cardid,DATE_FORMAT(stime, '%Y-%m-%d') day_time,SEC_TO_TIME(AVG(TIME_TO_SEC(ctime))) AS avgtime
+FROM record
+WHERE is_using=0
+GROUP BY cardid,day_time
+ORDER BY cardid ASC,day_time ASC;
+```
+
+### 上机次数视图
+
+#### 建立语句
+
+```sql
+DROP VIEW IF EXISTS times;
+CREATE VIEW times AS
+SELECT cardid,DATE_FORMAT(stime, '%Y-%m-%d') day_time,COUNT(*) AS times
+FROM record
+WHERE is_using=0
+GROUP BY cardid,day_time
+ORDER BY cardid ASC,day_time ASC;
+```
