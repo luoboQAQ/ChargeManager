@@ -73,14 +73,13 @@ void SQueryDialog::on_i_Btn_clicked()
 bool SQueryDialog::Q_atime(QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(ctime))) FROM record WHERE 1=1";
+    QString str = "SELECT SEC_TO_TIME(SUM(TIME_TO_SEC(sumtime))) FROM sumtime WHERE 1=1";
 
     str += QString(" AND cardid='%1'").arg(cardid);
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString(" AND day_time='%1' ").arg(startdate);
     }
     if (!query.exec(str) || !query.next())
     {
@@ -101,18 +100,17 @@ bool SQueryDialog::Q_atime(QDate date)
 bool SQueryDialog::Q_avgtime(QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT SEC_TO_TIME(AVG(TIME_TO_SEC(ctime))) FROM record WHERE 1=1";
+    QString str = "SELECT SEC_TO_TIME(AVG(TIME_TO_SEC(avgtime))) FROM avgtime WHERE 1=1";
 
     str += QString(" AND cardid='%1'").arg(cardid);
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString(" AND day_time='%1'").arg(startdate);
     }
     if (!query.exec(str) || !query.next())
     {
-        qDebug("查询上机时长失败！");
+        qDebug("查询平均上机时长失败！");
         qDebug() << str;
         qDebug() << query.lastError();
         return false;
@@ -184,14 +182,14 @@ bool SQueryDialog::Q_loss(QDate date)
 bool SQueryDialog::Q_income(QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT SUM(cost) FROM record WHERE is_using=0";
+    QString str = "SELECT SUM(sumcost) FROM sumcost WHERE 1=1";
     str += QString(" AND cardid='%1'").arg(cardid);
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString(" AND day_time='%1' ").arg(startdate);
     }
+
     if (!query.exec(str) || !query.next())
     {
         qDebug("查询上机花费失败！");
@@ -210,14 +208,13 @@ bool SQueryDialog::Q_income(QDate date)
 bool SQueryDialog::Q_vNum(QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT COUNT(*) FROM record WHERE is_using=0";
+    QString str = "SELECT SUM(times) FROM times WHERE 1=1";
 
     str += QString(" AND cardid='%1'").arg(cardid);
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        QString enddate = date.addDays(1).toString("yyyy-MM-dd");
-        str += QString(" AND stime>='%1' AND stime<='%2'").arg(startdate).arg(enddate);
+        str += QString(" AND day_time='%1'").arg(startdate);
     }
     if (!query.exec(str) || !query.next())
     {
