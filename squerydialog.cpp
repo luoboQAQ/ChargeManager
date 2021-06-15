@@ -7,6 +7,7 @@ SQueryDialog::SQueryDialog(QString cardid, QWidget *parent) : QDialog(parent),
     ui->setupUi(this);
     this->cardid = cardid;
     isAllDate = false;
+    ui->i_dateEdit->setDate(QDate::currentDate());
 }
 
 SQueryDialog::~SQueryDialog()

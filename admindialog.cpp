@@ -11,6 +11,7 @@ AdminDialog::AdminDialog(QString user, QWidget *parent) : QDialog(parent),
     setWindowFlags(windowFlag);
     ui->setupUi(this);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); //设置表为不可编辑
+    ui->i_dateEdit->setDate(QDate::currentDate());
     admin_id = user;
     userdialog = nullptr;
     SetupName();
