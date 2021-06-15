@@ -273,7 +273,7 @@ ORDER BY cardid ASC,day_time ASC;
 
 ### 平均使用时长视图
 
-### 建立语句
+#### 建立语句
 
 ```sql
 DROP VIEW IF EXISTS avgtime;
