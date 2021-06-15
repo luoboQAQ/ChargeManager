@@ -157,7 +157,7 @@ bool AdminDialog::Q_atime(QString user, QDate date)
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        str += QString("  AND day_time='%1'").arg(startdate);
+        str += QString(" AND day_time='%1'").arg(startdate);
     }
     GetQuery(str, query);
 
@@ -176,7 +176,7 @@ bool AdminDialog::Q_avgtime(QString user, QDate date)
     if (!date.isNull())
     {
         QString startdate = date.toString("yyyy-MM-dd");
-        str += QString("  AND day_time='%1'").arg(startdate);
+        str += QString(" AND day_time='%1'").arg(startdate);
     }
     GetQuery(str, query);
     QStringList title = {"上机平均时长"};

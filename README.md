@@ -243,3 +243,58 @@ UNION
 	FROM admin;
 ```
 
+### 总花费视图
+
+#### 建立语句
+
+```sql
+DROP VIEW IF EXISTS sumcost;
+CREATE VIEW sumcost AS
+SELECT cardid,DATE_FORMAT(stime, '%Y-%m-%d') day_time,SUM(cost) AS sumcost
+FROM record 
+WHERE is_using = 0 
+GROUP BY cardid,day_time
+ORDER BY cardid ASC,day_time ASC;
+```
+
+### 上机总时长视图
+
+#### 建立语句
+
+```sql
+DROP VIEW IF EXISTS sumtime;
+CREATE VIEW sumtime AS
+SELECT cardid,DATE_FORMAT(stime, '%Y-%m-%d') day_time,SEC_TO_TIME(SUM(TIME_TO_SEC(ctime))) AS sumtime
+FROM record
+WHERE is_using=0
+GROUP BY cardid,day_time
+ORDER BY cardid ASC,day_time ASC;
+```
+
+### 平均使用时长视图
+
+### 建立语句
+
+```sql
+DROP VIEW IF EXISTS avgtime;
+CREATE VIEW avgtime AS
+SELECT cardid,DATE_FORMAT(stime, '%Y-%m-%d') day_time,SEC_TO_TIME(AVG(TIME_TO_SEC(ctime))) AS avgtime
+FROM record
+WHERE is_using=0
+GROUP BY cardid,day_time
+ORDER BY cardid ASC,day_time ASC;
+```
+
+### 上机次数视图
+
+#### 建立语句
+
+```sql
+DROP VIEW IF EXISTS times;
+CREATE VIEW times AS
+SELECT cardid,DATE_FORMAT(stime, '%Y-%m-%d') day_time,COUNT(*) AS times
+FROM record
+WHERE is_using=0
+GROUP BY cardid,day_time
+ORDER BY cardid ASC,day_time ASC;
+```
