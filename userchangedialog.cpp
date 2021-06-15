@@ -251,7 +251,7 @@ void UserChangeDialog::ChangeStu()
                   "WHERE sno='%2';"
                   "UPDATE student SET sclass='%5' "
                   "WHERE sno='%2';"
-                  "UPDATE student SET sage='%6' "
+                  "UPDATE student SET sage=%6 "
                   "WHERE sno='%2';"
                   "UPDATE student SET ssex='%7' "
                   "WHERE sno='%2';"
