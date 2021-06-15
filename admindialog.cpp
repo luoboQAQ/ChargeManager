@@ -76,6 +76,9 @@ bool AdminDialog::SetupName()
         arg2 = query.value(1).toString();
         list += (arg1 + '(' + arg2 + ')');
     } while (query.next());
+    ui->i_userCBox->clear();
+    ui->l_userCBox->clear();
+    ui->c_userCBox->clear();
     ui->i_userCBox->addItems(list);
     list.removeFirst();
     ui->l_userCBox->addItems(list);
@@ -491,4 +494,5 @@ void AdminDialog::DialogClosed()
 {
     delete userdialog;
     userdialog = nullptr;
+    SetupName();
 }
