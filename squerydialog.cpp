@@ -127,7 +127,7 @@ bool SQueryDialog::Q_avgtime(QDate date)
 bool SQueryDialog::Q_charge(QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT ctime,cardid,money,opeartor_id FROM charge_record WHERE state=1";
+    QString str = "SELECT serial_num,ctime,cardid,money,opeartor_id FROM charge_record WHERE state=1";
 
     str += QString(" AND cardid='%1'").arg(cardid);
     if (!date.isNull())
@@ -143,7 +143,7 @@ bool SQueryDialog::Q_charge(QDate date)
         qDebug() << query.lastError();
         return false;
     }
-    QStringList title = {"充值时间", "卡号", "充值金额", "操作者ID"};
+    QStringList title = {"流水号","充值时间", "卡号", "充值金额", "操作者ID"};
     SetModel(query, title);
     ui->tableView->setModel(&model);
     ui->tableView->resizeColumnsToContents();
@@ -154,7 +154,7 @@ bool SQueryDialog::Q_charge(QDate date)
 bool SQueryDialog::Q_loss(QDate date)
 {
     QSqlQuery query;
-    QString str = QString("SELECT cardid,ltime,opeartor_id,state "
+    QString str = QString("SELECT serial_num,cardid,ltime,opeartor_id,state "
                           "FROM loss_record "
                           "WHERE 1=1");
 
@@ -172,7 +172,7 @@ bool SQueryDialog::Q_loss(QDate date)
         qDebug() << query.lastError();
         return false;
     }
-    QStringList title = {"卡号", "流水号", "操作者ID", "操作码"};
+    QStringList title = {"流水号","卡号", "挂失时间", "操作者ID", "操作码"};
     SetModel(query, title);
     ui->tableView->setModel(&model);
     ui->tableView->resizeColumnsToContents();
