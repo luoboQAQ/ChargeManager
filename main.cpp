@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
     opendb();
     LoginDialog w;
     w.show();
+    srand(QDateTime::currentDateTime().toSecsSinceEpoch()); //生成随机数种子
     return a.exec();
 }
 

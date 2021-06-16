@@ -98,7 +98,7 @@ void StudentDialog::on_loginBtn_clicked()
 
         //生成流水号
         QDateTime current_time = QDateTime::currentDateTime();
-        serial_num = current_time.toString("ddhhmmss");
+        serial_num = current_time.toString("ddhhmmss") + QString::number(rand() % 100);
         QString start_time = current_time.toString("yyyy-MM-ddThh:mm:ss");
 
         //生成上机记录
@@ -148,10 +148,12 @@ void StudentDialog::on_loginBtn_clicked()
         }
         //生成流水号
         QDateTime current_time = QDateTime::currentDateTime();
+        QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
         QString now_time = current_time.toString("yyyy-MM-ddThh:mm:ss");
         //如果产生消费，则写入消费记录
-        str = QString("INSERT INTO charge_record(ctime,cardid,money,opeartor_id,state)"
-                      " VALUES('%1','%2','%3','%4','0')")
+        str = QString("INSERT INTO charge_record(serial_num,ctime,cardid,money,opeartor_id,state)"
+                      " VALUES('%1','%2','%3','%4','%5','0')")
+                  .arg(nonum)
                   .arg(now_time)
                   .arg(cardid)
                   .arg(cost)
@@ -244,9 +246,11 @@ void StudentDialog::on_reportLossBtn_clicked()
         return;
     QSqlQuery query;
     QDateTime current_time = QDateTime::currentDateTime();
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
     QString losstime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    QString str = QString("INSERT INTO loss_record "
-                          "VALUES('%1','%2','%3','0')")
+    QString str = QString("INSERT INTO loss_record(serial_num,ltime,cardid,opeartor_id,state) "
+                          "VALUES('%1','%2','%3','%4','0')")
+                      .arg(nonum)
                       .arg(losstime)
                       .arg(cardid)
                       .arg(userid);
@@ -276,9 +280,11 @@ void StudentDialog::on_rechargeBtn_clicked()
         banlance += inputValue;
         QSqlQuery query;
         QDateTime current_time = QDateTime::currentDateTime();
+        QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
         QString ctime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-        QString str = QString("INSERT INTO charge_record(ctime,cardid,money,opeartor_id,state)"
-                              " VALUES('%1','%2',%3,'%4',1)")
+        QString str = QString("INSERT INTO charge_record(serial_num,ctime,cardid,money,opeartor_id,state)"
+                              " VALUES('%1','%2','%3',%4,'%5',1)")
+                          .arg(nonum)
                           .arg(ctime)
                           .arg(cardid)
                           .arg(inputValue)

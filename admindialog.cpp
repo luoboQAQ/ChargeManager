@@ -189,7 +189,7 @@ bool AdminDialog::Q_avgtime(QString user, QDate date)
 bool AdminDialog::Q_charge(QString user, QDate date)
 {
     QSqlQuery query;
-    QString str = "SELECT ctime,cardid,money,opeartor_id FROM charge_record WHERE state=1";
+    QString str = "SELECT serial_num,ctime,cardid,money,opeartor_id FROM charge_record WHERE state=1";
     if (!user.isNull())
         str += QString(" AND cardid='%1'").arg(user);
     if (!date.isNull())
@@ -205,7 +205,7 @@ bool AdminDialog::Q_charge(QString user, QDate date)
         qDebug() << query.lastError();
         return false;
     }
-    QStringList title = {"充值时间", "卡号", "充值金额", "操作者ID"};
+    QStringList title = {"流水号","充值时间", "卡号", "充值金额", "操作者ID"};
     SetModel(query, title);
     return true;
 }
@@ -214,7 +214,7 @@ bool AdminDialog::Q_charge(QString user, QDate date)
 bool AdminDialog::Q_loss(QString user, QDate date)
 {
     QSqlQuery query;
-    QString str = QString("SELECT cardid,ltime,opeartor_id,state "
+    QString str = QString("SELECT serial_num,cardid,ltime,opeartor_id,state "
                           "FROM loss_record "
                           "WHERE 1=1");
     if (!user.isNull())
@@ -232,7 +232,7 @@ bool AdminDialog::Q_loss(QString user, QDate date)
         qDebug() << query.lastError();
         return false;
     }
-    QStringList title = {"卡号", "流水号", "操作者ID", "操作码"};
+    QStringList title = {"流水号","卡号", "挂失时间", "操作者ID", "操作码"};
     SetModel(query, title);
     return true;
 }
@@ -348,9 +348,11 @@ bool AdminDialog::L_reloss(QString cardid)
         return false;
     }
     QDateTime current_time = QDateTime::currentDateTime();
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
     QString losstime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    str = QString("INSERT INTO loss_record(ltime,cardid,opeartor_id,state) "
-                  "VALUES('%1','%2','%3','1')")
+    str = QString("INSERT INTO loss_record(serial_num,ltime,cardid,opeartor_id,state) "
+                  "VALUES('%1','%2','%3','%4','1')")
+              .arg(nonum)
               .arg(losstime)
               .arg(cardid)
               .arg(admin_id);
@@ -394,9 +396,11 @@ int AdminDialog::L_loss(QString cardid)
                               QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
         return -4;
     QDateTime current_time = QDateTime::currentDateTime();
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
     QString losstime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    str = QString("INSERT INTO loss_record "
-                  "VALUES('%1','%2','%3','0')")
+    str = QString("INSERT INTO loss_record(serial_num,ltime,cardid,opeartor_id,state) "
+                  "VALUES('%1','%2','%3','%4','0')")
+              .arg(nonum)
               .arg(losstime)
               .arg(cardid)
               .arg(admin_id);
@@ -426,9 +430,11 @@ void AdminDialog::on_c_Btn_clicked()
         return;
     QString cardid = query.value(0).toString();
     QDateTime current_time = QDateTime::currentDateTime();
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
     QString ctime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    str = QString("INSERT INTO charge_record(ctime,cardid,money,opeartor_id,state)"
-                  " VALUES('%1','%2',%3,'%4',1)")
+    str = QString("INSERT INTO charge_record(serial_num,ctime,cardid,money,opeartor_id,state)"
+                  " VALUES('%1','%2','%3',%4,'%5',1)")
+              .arg(nonum)
               .arg(ctime)
               .arg(cardid)
               .arg(money)
