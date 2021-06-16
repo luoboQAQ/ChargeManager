@@ -156,8 +156,10 @@ void UserChangeDialog::AddStu()
         ok2 = false;
     }
 
-    str = QString("INSERT INTO user_record(stime,aid,change_way,sno) "
-                  "VALUES('%1','%2','0','%3')")
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
+    str = QString("INSERT INTO user_record(serial_num,stime,aid,change_way,sno) "
+                  "VALUES('%1','%2','%3','0','%4')")
+              .arg(nonum)
               .arg(createday)
               .arg(admin_id)
               .arg(sno);
@@ -272,9 +274,11 @@ void UserChangeDialog::ChangeStu()
         return;
     }
     QDateTime current_time = QDateTime::currentDateTime();
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
     QString stime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    str = QString("INSERT INTO  user_record(stime,aid,change_way,sno) "
-                  "VALUES('%1','%2','1','%3')")
+    str = QString("INSERT INTO user_record(serial_num,stime,aid,change_way,sno) "
+                  "VALUES('%1','%2','%3','1','%4')")
+              .arg(nonum)
               .arg(stime)
               .arg(admin_id)
               .arg(sno);
@@ -333,9 +337,11 @@ void UserChangeDialog::DelStu()
         return;
     }
     QDateTime current_time = QDateTime::currentDateTime();
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
     QString stime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    str = QString("INSERT INTO  user_record(stime,aid,change_way,sno) "
-                  "VALUES('%1','%2','2','%3')")
+    str = QString("INSERT INTO  user_record(serial_num,stime,aid,change_way,sno) "
+                  "VALUES('%1','%2','%3','2','%4')")
+              .arg(nonum)
               .arg(stime)
               .arg(admin_id)
               .arg(sno);

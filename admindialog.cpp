@@ -348,9 +348,11 @@ bool AdminDialog::L_reloss(QString cardid)
         return false;
     }
     QDateTime current_time = QDateTime::currentDateTime();
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
     QString losstime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    str = QString("INSERT INTO loss_record(ltime,cardid,opeartor_id,state) "
-                  "VALUES('%1','%2','%3','1')")
+    str = QString("INSERT INTO loss_record(serial_num,ltime,cardid,opeartor_id,state) "
+                  "VALUES('%1','%2','%3','%4','1')")
+              .arg(nonum)
               .arg(losstime)
               .arg(cardid)
               .arg(admin_id);
@@ -394,9 +396,11 @@ int AdminDialog::L_loss(QString cardid)
                               QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
         return -4;
     QDateTime current_time = QDateTime::currentDateTime();
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
     QString losstime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    str = QString("INSERT INTO loss_record "
-                  "VALUES('%1','%2','%3','0')")
+    str = QString("INSERT INTO loss_record(serial_num,ltime,cardid,opeartor_id,state) "
+                  "VALUES('%1','%2','%3','%4','0')")
+              .arg(nonum)
               .arg(losstime)
               .arg(cardid)
               .arg(admin_id);
@@ -426,9 +430,11 @@ void AdminDialog::on_c_Btn_clicked()
         return;
     QString cardid = query.value(0).toString();
     QDateTime current_time = QDateTime::currentDateTime();
+    QString nonum = current_time.toString("ddhhmmss") + QString::number(rand() % 100); //生成流水号
     QString ctime = current_time.toString("yyyy-MM-ddThh:mm:ss");
-    str = QString("INSERT INTO charge_record(ctime,cardid,money,opeartor_id,state)"
-                  " VALUES('%1','%2',%3,'%4',1)")
+    str = QString("INSERT INTO charge_record(serial_num,ctime,cardid,money,opeartor_id,state)"
+                  " VALUES('%1','%2','%3',%4,'%5',1)")
+              .arg(nonum)
               .arg(ctime)
               .arg(cardid)
               .arg(money)
