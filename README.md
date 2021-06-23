@@ -1,6 +1,27 @@
 # 机房收费管理系统
 
-基于Qt+MySQL的机房收费管理系统。
+> 基于Qt+MySQL的机房收费管理系统。
+
+##  程序功能说明
+
+本系统实现了五大模块，分别为：登录模块、上机管理模块、充值挂失模块、查找统计模块、学生管理模块。
+
+登录模块将管理学生和管理员的登录和登出，同时包括身份验证、功能跳转、权限管理等功能。
+
+上机管理模块将管理学生的上机登记，当上机卡余额不足3元或卡处于挂失状态，则拒绝上机。每位学生的每次上机都会形成一条记录，每60S判断学生卡里余额是否足够，如果不够则立刻要求下机。
+
+充值挂失模块将负责上机卡的充值和挂失功能。学生拥有充值和挂失的权限，管理员在此基础上增加找回的功能。
+
+查找统计模块将负责查询并统计某天上机的总时数、每次上机的平均时数和机房的收入；某学生上机的次数、上机总时数、每次上机平均时间。
+
+学生管理模块将负责学生数据的增加、删除、修改。
+
+## 编译和调试说明
+
+- 在MySQL中使用下面`表的设置`里的sql语句构建完成系统需要的表
+- 使用cmake完成程序的编译
+- 学生默认账号为`20001`，密码为`123`
+- 管理员默认账号为`001`,密码为`001`
 
 ## 表的设置
 
@@ -43,7 +64,11 @@ CREATE TABLE `student` (
 #### 测试数据插入
 
 ```sql
-INSERT INTO `student` (`sno`, `sname`, `spasswd`, `sdc`, `sclass`, `sage`, `ssex`) VALUES ('20001', '小红', '123', '计算机', '1901', 20, '女');
+INSERT INTO `student` (`sno`, `sname`, `spasswd`, `sdc`, `sclass`, `sage`, `ssex`) VALUES ('20001', '小然', '123', '美术', '1901', 18, '女');
+INSERT INTO `student` (`sno`, `sname`, `spasswd`, `sdc`, `sclass`, `sage`, `ssex`) VALUES ('20002', '小乐', '123', '音乐', '1901', 19, '女');
+INSERT INTO `student` (`sno`, `sname`, `spasswd`, `sdc`, `sclass`, `sage`, `ssex`) VALUES ('20003', '小晚', '123', '计算机', '1902', 18, '女');
+INSERT INTO `student` (`sno`, `sname`, `spasswd`, `sdc`, `sclass`, `sage`, `ssex`) VALUES ('20004', '小贝', '123', '舞蹈', '1901', 19, '女');
+INSERT INTO `student` (`sno`, `sname`, `spasswd`, `sdc`, `sclass`, `sage`, `ssex`) VALUES ('20005', '小琳', '123', '法学', '1901', 19, '女');
 ```
 
 ### 上机卡表
@@ -65,7 +90,11 @@ CREATE TABLE `card` (
 #### 测试数据插入
 
 ```sql
-INSERT INTO `card` (`cardid`, `createday`, `sno`, `banlance`, `state`) VALUES ('001', '2021-05-08 00:00:00', '20001', 10, 1);
+INSERT INTO `card` (`cardid`, `createday`, `sno`, `banlance`, `state`) VALUES ('001', '2021-05-08 00:00:00', '20001', 2.9, 1);
+INSERT INTO `card` (`cardid`, `createday`, `sno`, `banlance`, `state`) VALUES ('002', '2021-06-05 10:50:27', '20002', 9.6, 1);
+INSERT INTO `card` (`cardid`, `createday`, `sno`, `banlance`, `state`) VALUES ('003', '2021-06-05 11:41:52', '20003', 4, 1);
+INSERT INTO `card` (`cardid`, `createday`, `sno`, `banlance`, `state`) VALUES ('004', '2021-06-16 16:19:28', '20004', 3, 1);
+INSERT INTO `card` (`cardid`, `createday`, `sno`, `banlance`, `state`) VALUES ('005', '2021-06-16 16:19:48', '20005', 3, 1);
 ```
 
 ### 计算机表
@@ -292,3 +321,7 @@ WHERE is_using=0
 GROUP BY cardid,day_time
 ORDER BY cardid ASC,day_time ASC;
 ```
+
+## 程序代码
+
+> 源代码遵循 [GNU General Public License v3.0](https://gitee.com/luoboQAQ/charge-manager/blob/master/LICENSE) 开源许可协议
